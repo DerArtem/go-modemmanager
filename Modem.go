@@ -444,11 +444,19 @@ func (m modem) SetCurrentCapabilities(capabilities []MMModemCapability) error {
 }
 
 func (m modem) SetCurrentModes(property Mode) error {
-	// todo: untested
 	var mode MMModemMode
-	var resSlice = []uint32{mode.SliceToBitmask(property.AllowedModes),
-		mode.SliceToBitmask([]MMModemMode{property.PreferredMode})}
-	return m.call(ModemSetCurrentModes, resSlice)
+
+	type resStruct struct {
+		AllowedModes  uint32
+		PreferredMode uint32
+	}
+
+	resp := resStruct{
+		AllowedModes:  mode.SliceToBitmask(property.AllowedModes),
+		PreferredMode: mode.SliceToBitmask([]MMModemMode{property.PreferredMode}),
+	}
+
+	return m.call(ModemSetCurrentModes, resp)
 }
 
 func (m modem) SetCurrentBands(bands []MMModemBand) error {
